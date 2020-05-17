@@ -16,6 +16,7 @@
 
 package com.feup.sfs.modbus;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -45,11 +46,15 @@ public class ModbusSlave {
 		ModbusCoupler.getReference().setUnitID(1);
 		listener = new ModbusTCPListener(5);
 		listener.setPort(port);
-		if (loopback) {
-			try {
-				listener.setAddress(InetAddress.getByName("127.0.0.1"));
-			} catch (UnknownHostException e) {
+		try {
+			if (loopback) {
+				listener.setAddress(Inet4Address.getLocalHost());
+			} else {
+				listener.setAddress(Inet4Address.getByName("0.0.0.0"));
 			}
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			System.exit(-1);
 		}
 		new Thread(new Runnable() {
 			public void run() {
